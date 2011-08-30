@@ -19,8 +19,15 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+            $this->auth->check_logged($this->router->class , $this->router->method);
+
+            $this->load->view('welcome_message');
 	}
+        
+        public function __construct()
+        {
+            parent::__construct();
+        }
 }
 
 /* End of file welcome.php */
