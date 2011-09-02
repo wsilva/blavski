@@ -43,10 +43,10 @@ class Home extends CI_Controller
     public function login()
     {
         $data['titulo']="Testando";
-        $this->load->view('header', $data);
+        $this->load->view('tmpl/header', $data);
         $data = NULL;
         $this->load->view('login', $data);
-        $this->load->view('footer');
+        $this->load->view('tmpl/footer');
     }
 
     public function dologin()
