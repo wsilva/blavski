@@ -29,23 +29,21 @@ class Home extends CI_Controller
     public function sempermissao()
     {
 
-        echo "<html>";
-        echo "<title>Acesso Negado</title>";
-        echo "<body bgcolor='#EEEEEE'>";
-        echo " <div style='padding:20px;background-color:#FFCC00;'>";
-        echo "<h2>Você não tem permissão para acessar esta funcionalidade.</h2>";
-        echo "</div>";
-        echo "</body>";
-        echo "</html>";
+        $mensagens = array('error'=>'Você não tem permissão para acessar esta funcionalidade.');
+        $this->session->set_flashdata('mensagens', $mensagens);
+        redirect(base_url() . 'home/login', 'refresh');
         exit();
     }
 
     public function login()
     {
-        $data['titulo']="Testando";
+        $data = array();
+        
+        # pegando mensagens da sessão flash
+        $data['mensagens'] = $this->session->flashdata('mensagens');
+        
         $this->load->view('tmpl/header', $data);
-        $data = NULL;
-        $this->load->view('login', $data);
+        $this->load->view('login');
         $this->load->view('tmpl/footer');
     }
 
@@ -55,6 +53,8 @@ class Home extends CI_Controller
         $senha = md5($this->input->post('senha'));
         if ($usuario == ""  || $this->input->post('senha') == "")
         {
+            $mensagens = array('error'=>'Usuário e senha devem se informados.');
+            $this->session->set_flashdata('mensagens', $mensagens);
             redirect(base_url() . 'home/login', 'refresh');
             exit();
         }
@@ -74,6 +74,8 @@ class Home extends CI_Controller
         
         if (count($result) < 1)
         {
+            $mensagens = array('error'=>'Usuário e ou senha incorretos.');
+            $this->session->set_flashdata('mensagens', $mensagens);
             redirect(base_url() . 'home/login', 'refresh');
             exit();
         }
@@ -100,7 +102,11 @@ class Home extends CI_Controller
     public function logout()
     {
         $this->session->sess_destroy();
-        $this->login();
+        $mensagens = array('notice'=>'Logout realizado com sucesso.');
+        $this->session->set_flashdata('mensagens', $mensagens);
+//        $this->login();
+        redirect(base_url() . 'home/login', 'refresh');
+        exit();
     }
 
 }

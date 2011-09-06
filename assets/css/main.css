@@ -1,0 +1,125 @@
+body
+{
+    background-color: #fff;
+    margin: 0px;
+    font: 13px/20px normal Helvetica, Arial, sans-serif;
+    color: #4F5155;
+}
+
+#container
+{
+	margin: 0 auto;
+	width: auto;
+	background: #fff;
+}
+
+#header
+{
+	background: #ccc;
+	padding: 5px 20px 20px 20px;
+}
+
+
+#nav_user { text-align: right; }
+#nav_user ul { padding: 0; margin: 0; list-style: none; } 
+#nav_user ul li { padding: 0; margin: 0 20px 0 0; display:inline; }
+#nav_user li a { width: 100px; font-size: 11px; text-align: center; text-decoration: none; color: #74809A }
+#nav_user li a:hover { background-color: transparent !important; color: #c81419; }
+#nav_user ul li.selected a { color: #c81419; }
+
+#header h1 { margin: 0;}
+#header h1 a{ color:#4F5155; text-decoration: none;}
+
+
+#navigation
+{
+	float: left;
+	width: 100%;
+	background: #333;
+}
+
+#navigation ul
+{
+	margin: 0;
+	padding: 0;
+}
+
+#navigation ul li
+{
+	list-style-type: none;
+	display: inline;
+}
+
+#navigation li a
+{
+	display: block;
+	float: left;
+	padding: 5px 10px;
+	color: #fff;
+	text-decoration: none;
+	border-right: 1px solid #fff;
+}
+
+#navigation li a:hover { background: #c81419; }
+
+#content-container
+{
+	float: left;
+	width: 100%;
+/*	background: #fff url(/wp-content/uploads/layout-two-fixed-background.gif) repeat-y 100% 0;*/
+background: #FFF 100% 0;
+}
+
+#content
+{
+	clear: left;
+	float: left;
+	width: 63%;
+	padding: 20px 0;
+	margin: 0 0 0 30px;
+	display: inline;
+}
+
+#content h2 { margin: 0; }
+
+#aside
+{
+	float: right;
+	width: 23%;
+	padding: 20px 0;
+	margin: 0 20px 0 0;
+	display: inline;
+}
+
+#aside h3 { margin: 0; }
+
+#footer
+{
+	clear: both;
+	background: #ccc;
+	text-align: center;
+	padding: 20px;
+	height: 1%;
+}
+
+#footer a { text-decoration: none; color: #74809A }
+
+#footer a:hover { background-color: transparent !important; color: #c81419; }
+
+
+/* style the flash; there is an id flash at the section and a class at each of the flash divs */
+#flash_notice, #flash_error, #flash_alert {
+    padding: 5px 8px;
+    margin-bottom: 10px;
+    width: 425px;
+}
+
+#flash_notice {
+}
+
+
+#flash { }
+.flash { padding: 10px; margin-bottom: 30px; }
+.error, .alert { background-color: #FCC; border: solid 1px #C66; }
+.notice { background-color: #CFC; border: solid 1px #6C6; }
+.myinfo { background-color: #00cc00; }

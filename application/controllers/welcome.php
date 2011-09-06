@@ -20,8 +20,13 @@ class Welcome extends CI_Controller {
 	public function index()
 	{
             $this->auth->check_logged($this->router->class , $this->router->method);
+            
+            $data = array();
 
+            $this->load->view('tmpl/header', $data);
             $this->load->view('welcome_message');
+            $this->load->view('tmpl/footer');
+
 	}
         
         public function __construct()
