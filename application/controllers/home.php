@@ -18,12 +18,16 @@ class Home extends CI_Controller
         redirect(base_url() . 'home/login', 'refresh');
     }
 
-    public function void()
+    public function logado()
     {
-        $data['js_to_load'] = null;
-        $this->load->view('libs/html-header', $data);
-        $this->load->view('libs/menu');
-        $this->load->view('libs/html-footer');
+        $data = array();
+        
+        # pegando mensagens da sessão flash
+        $data['mensagens'] = $this->session->flashdata('mensagens');
+        
+        $this->load->view('tmpl/header',$data);
+        $this->load->view('logado');
+        $this->load->view('tmpl/footer');
     }
 
     public function sempermissao()
@@ -31,7 +35,7 @@ class Home extends CI_Controller
 
         $mensagens = array('error'=>'Você não tem permissão para acessar esta funcionalidade.');
         $this->session->set_flashdata('mensagens', $mensagens);
-        redirect(base_url() . 'home/login', 'refresh');
+        redirect(base_url() . 'home/logado', 'refresh');
         exit();
     }
 
@@ -53,7 +57,7 @@ class Home extends CI_Controller
         $senha = md5($this->input->post('senha'));
         if ($usuario == ""  || $this->input->post('senha') == "")
         {
-            $mensagens = array('error'=>'Usuário e senha devem se informados.');
+            $mensagens = array('error'=>'Usuário e senha devem ser informados.');
             $this->session->set_flashdata('mensagens', $mensagens);
             redirect(base_url() . 'home/login', 'refresh');
             exit();
@@ -83,7 +87,7 @@ class Home extends CI_Controller
         else
         {
             $login = array(
-                'id_usuario' => $result[0]->id,
+                'usuario_id' => $result[0]->id,
                 'usuario' => $result[0]->login,
                 'nome' => $result[0]->nome,
                 'email' => $result[0]->email,
@@ -95,12 +99,13 @@ class Home extends CI_Controller
             $data['dt'] = date('Y-m-d H:i:s');
             $this->db->insert('acessos', $data);
             $this->session->set_userdata($login);
-            redirect(base_url() . 'home/void', 'refresh');
+            redirect(base_url() . 'home/logado', 'refresh');
         }
     }
 
     public function logout()
     {
+        unset($this->session->userdata);
         $this->session->sess_destroy();
         $mensagens = array('notice'=>'Logout realizado com sucesso.');
         $this->session->set_flashdata('mensagens', $mensagens);
