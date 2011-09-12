@@ -18,14 +18,23 @@
             echo form_open('/home/dologin');
 
             echo form_fieldset('Entrar');
+            
+            echo "<p>";
             echo form_label('Usuário', 'usuario');
+            echo "<br/>";
             echo form_input('usuario', set_value('usuario', $this->input->post('usuario')));
-            echo "<br/>";
+            echo "</p>";
+            
+            echo "<p>";
             echo form_label('Senha', 'senha');
-            echo form_password('senha');
             echo "<br/>";
+            echo form_password('senha');
+            echo "</p>";
+            
+            echo "<p>";
             echo form_submit('entrar', 'Entrar');
-
+            echo "</p>";
+            
             echo form_fieldset_close();
 
             echo form_close();
