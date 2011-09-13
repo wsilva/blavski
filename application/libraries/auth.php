@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
 
 class Auth
 {
@@ -108,12 +110,12 @@ class Auth
         $this->CI = & get_instance();
 
         $sql = "SELECT SQL_CACHE
-                    count(sys_permissoes.id) as found
+                    count(permissoes.id) as found
                 FROM
                     permissoes
-                INNER JOIN sys_metodos
-                    ON metodos.id = permissoes.id_metodo
-                WHERE id_usuario = '" . $this->ci->session->userdata('usuario_id') . "'
+                INNER JOIN metodos
+                    ON metodos.id = permissoes.metodo_id
+                WHERE usuario_id = '" . $this->ci->session->userdata('usuario_id') . "'
                     AND classe = '" . $classe . "'
                     AND metodo = '" . $metodo . "'";
 
