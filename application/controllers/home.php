@@ -15,27 +15,30 @@ class Home extends CI_Controller
 
     public function index()
     {
-        redirect(base_url() . 'home/login', 'refresh');
+        if( $this->session->userdata('logged_in') )
+        {
+            $data = array();
+        
+            # pegando mensagens da sessão flash
+            $data['mensagens'] = $this->session->flashdata('mensagens');
+
+            $this->load->view('tmpl/header',$data);
+            $this->load->view('logado');
+            $this->load->view('tmpl/footer');        
+        }
+        else
+        {
+            redirect(base_url() . 'home/login', 'refresh');            
+        }
     }
 
-    public function logado()
-    {
-        $data = array();
-        
-        # pegando mensagens da sessão flash
-        $data['mensagens'] = $this->session->flashdata('mensagens');
-        
-        $this->load->view('tmpl/header',$data);
-        $this->load->view('logado');
-        $this->load->view('tmpl/footer');
-    }
 
     public function sempermissao()
     {
 
         $mensagens = array('error'=>'Você não tem permissão para acessar esta funcionalidade.');
         $this->session->set_flashdata('mensagens', $mensagens);
-        redirect(base_url() . 'home/logado', 'refresh');
+        redirect(base_url() . 'home', 'refresh');
         exit();
     }
 
@@ -99,7 +102,7 @@ class Home extends CI_Controller
             $data['dt'] = date('Y-m-d H:i:s');
             $this->db->insert('acessos', $data);
             $this->session->set_userdata($login);
-            redirect(base_url() . 'home/logado', 'refresh');
+            redirect(base_url() . 'home', 'refresh');
         }
     }
 
