@@ -95,8 +95,62 @@ class Usuario extends CI_Controller
     
     public function grava_novo()
     {
-        var_dump('ação de gravar novo');
-        die('testando');
+        $this->load->library('form_validation');
+        
+        # validações
+        $validacoes = array(
+            array(
+                'field' => 'usuario',
+                'label' => 'Usuário',
+                'rules' => 'trim|required|alpha_numeric|min_length[5]|max_length[20]|xss_clean'
+            ),
+            array(
+                'field' => 'nome',
+                'label' => 'Nome',
+                'rules' => 'trim|required|min_length[5]|max_length[200]|xss_clean'
+            ),
+            array(
+                'field' => 'email',
+                'label' => 'E-mail',
+                'rules' => 'trim|required|max_length[150]|valid_email'
+            ),
+            array(
+                'field' => 'senha',
+                'label' => 'Senha',
+                'rules' => 'trim|required|min_length[5]|max_length[200]|matches[confirmacao]|md5'
+            ),
+            array(
+                'field' => 'confirmacao',
+                'label' => 'Confirmação de Senha',
+                'rules' => 'trim|required'
+            )
+        );
+        $this->form_validation->set_rules($validacoes);
+        
+        # mensagens de erro
+        $this->form_validation->set_message('required', 'O campo <strong>%s</strong> é obrigatório');
+        $this->form_validation->set_message('min_length', 'O campo <strong>%s</strong> deve ter no mínimo %s caracteres');
+        $this->form_validation->set_message('max_length', 'O campo <strong>%s</strong> deve ter no máximo %s caracteres');
+        $this->form_validation->set_message('alpha_numeric', 'O campo <strong>%s</strong> deve ter apenas letras e/ou números');
+        $this->form_validation->set_message('valid_email', 'O campo <strong>%s</strong> deve ter um endereço de e-mail válido');
+        $this->form_validation->set_message('matches', 'Os campos <strong>%s</strong> e <strong>%s</strong> não conferem.');
+        
+        # definindo delimitadores
+        $this->form_validation->set_error_delimiters('<li class="submiterror">', '</li>');
+        
+        # não passou na validação
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->novo();
+        }
+        
+        #passou na validação
+        else
+        {
+            var_dump('ação de gravar novo');
+            die('testando');
+            $this->load->view('formsuccess');
+        }
     }
 
     public function __construct()

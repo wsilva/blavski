@@ -91,7 +91,7 @@ class Home extends CI_Controller
         {
             $login = array(
                 'usuario_id' => $result[0]->id,
-                'usuario' => $result[0]->login,
+                'usuario' => $result[0]->usuario,
                 'nome' => $result[0]->nome,
                 'email' => $result[0]->email,
                 'logged_in' => TRUE,
