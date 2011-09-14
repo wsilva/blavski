@@ -1,5 +1,8 @@
 <div id="content-container">
+    
     <div id="content">
+        
+        <h1>Lista de Usuários</h1>
         
         <div id="flash">
             <?php if( is_array($mensagens) ): ?>
@@ -13,9 +16,14 @@
         <?php echo $pagination; ?>
         
     </div>
+    
     <div id="aside">
-        bla
+        <div id="links" class="box">
+            <h3>Usuários</h3>
+            <p><a href="/usuario/novo">novo usuário</a></p>
+        </div>      
     </div>
+    
 </div>
 
 <script type="text/javascript">
@@ -24,7 +32,7 @@
         var resp = confirm("Deseja realmente remover?");
         if(resp)
         {
-            window.location = '<?php echo base_url(); ?>usuario/remover/' + usuario_id;
+            window.location = '/usuario/remover/' + usuario_id;
         }
     }
 </script>

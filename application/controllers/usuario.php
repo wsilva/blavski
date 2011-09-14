@@ -92,6 +92,12 @@ class Usuario extends CI_Controller
         $this->load->view('usuarionovo');
         $this->load->view('tmpl/footer');
     }
+    
+    public function grava_novo()
+    {
+        var_dump('ação de gravar novo');
+        die('testando');
+    }
 
     public function __construct()
     {
