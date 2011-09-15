@@ -147,9 +147,39 @@ class Usuario extends CI_Controller
         #passou na validação
         else
         {
-            var_dump('ação de gravar novo');
-            die('testando');
-            $this->load->view('formsuccess');
+            
+            # carregando model
+            $this->load->model('Usuario_model');
+            
+            # criando o objeto usuário
+            $usuario = new Usuario_model();
+            
+            # populando obj usuário
+            $usuario->usuario = $this->input->post('usuario');
+            $usuario->nome = $this->input->post('nome');
+            $usuario->email = $this->input->post('email');
+            $usuario->senha = $this->input->post('senha');
+            $usuario->dt_cadastro = date('Y-m-d H:i:s');
+            $usuario->dt_alteracao = $usuario->dt_cadastro;
+            
+            # gravando dados no banco
+            if( $usuario->grava() )
+            {
+                $mensagens = array('notice'=>'Usuário criado com sucesso');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            #erro ao gravar dados
+            else
+            {
+                $mensagens = array('error'=>'Erro ao criar usuário');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            # redirecionando
+            redirect(base_url() . 'usuario', 'refresh');
+            exit();
+            
         }
     }
 
