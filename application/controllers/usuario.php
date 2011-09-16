@@ -19,10 +19,10 @@ class Usuario extends CI_Controller
         $offset = $this->uri->segment($uri_segment);
         
         //carregando model
-        $this->load->model('Usuario_model');
+        $this->load->model('UsuarioModel');
         
-        $usuarios = $this->Usuario_model->buscartodos();
-        $usuarios_pag = $this->Usuario_model->buscarporqtde($this->limit, $offset);
+        $usuarios = $this->UsuarioModel->buscartodos();
+        $usuarios_pag = $this->UsuarioModel->buscarporqtde($this->limit, $offset);
         
         //paginação
         $this->load->library('pagination');
@@ -47,9 +47,9 @@ class Usuario extends CI_Controller
             
 
             //ações
-            $actions = "<a href='alterar/{$usuario->id}' >editar</a>";
-            $actions .= " | <a href='senha/{$usuario->id}' >nova senha</a>";
-            $actions .= " | <a href='permissoes/{$usuario->id}' >permissoes</a>";
+            $actions = "<a href='/usuario/alterar/{$usuario->id}' >editar</a>";
+            $actions .= " | <a href='/usuario/senha/{$usuario->id}' >nova senha</a>";
+            $actions .= " | <a href='/usuario/permissoes/{$usuario->id}' >permissoes</a>";
             $actions .= " | <a href=\"javascript:removeConfirmation({$usuario->id})\" >remover</a>";
 
             //create update
@@ -149,10 +149,10 @@ class Usuario extends CI_Controller
         {
             
             # carregando model
-            $this->load->model('Usuario_model');
+            $this->load->model('UsuarioModel');
             
             # criando o objeto usuário
-            $usuario = new Usuario_model();
+            $usuario = new UsuarioModel();
             
             # populando obj usuário
             $usuario->usuario = $this->input->post('usuario');
@@ -181,6 +181,31 @@ class Usuario extends CI_Controller
             exit();
             
         }
+    }
+    
+    public function permissoes()
+    {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        $data = array();
+        
+        //pegando id do usuario
+        $usuario_id = $this->uri->segment(3);
+        
+        //carregando model
+        $this->load->model('UsuarioModel');
+        $this->load->model('PermissaoModel');
+        $this->load->model('MetodoModel');
+        
+        $usuario = new UsuarioModel($usuario_id);
+        $permissoes = $this->PermissaoModel->buscarporusuario($usuario_id);
+        $metodos = $this->MetodoModel->buscartodos();
+        
+        var_dump($usuario);
+        var_dump($permissoes);
+        var_dump($metodos);
+        die('testando');
+        
     }
 
     public function __construct()
