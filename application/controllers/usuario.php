@@ -48,9 +48,12 @@ class Usuario extends CI_Controller
 
             //ações
             $actions = "<a href='/usuario/alterar/{$usuario->id}' >editar</a>";
-            $actions .= " | <a href='/usuario/senha/{$usuario->id}' >nova senha</a>";
+            $actions .= " | <a href='/usuario/novasenha/{$usuario->id}' >nova senha</a>";
             $actions .= " | <a href='/usuario/permissoes/{$usuario->id}' >permissoes</a>";
-            $actions .= " | <a href=\"javascript:removeConfirmation({$usuario->id})\" >remover</a>";
+            
+            //evitando de remover a si mesmo - wired behavior
+            if( $this->session->userdata('usuario_id') != $usuario->id )
+                $actions .= " | <a href=\"javascript:removeConfirmation({$usuario->id})\" >remover</a>";
 
             //create update
             $created = mdate('%d/%m/%Y %Hh%i', mysql_to_unix($usuario->dt_cadastro));
@@ -75,7 +78,7 @@ class Usuario extends CI_Controller
         $data['mensagens'] = $this->session->flashdata('mensagens');
 
         $this->load->view('tmpl/header', $data);
-        $this->load->view('usuariolist');
+        $this->load->view('usuario/list');
         $this->load->view('tmpl/footer');
     }
     
@@ -89,13 +92,15 @@ class Usuario extends CI_Controller
         $data['mensagens'] = $this->session->flashdata('mensagens');
 
         $this->load->view('tmpl/header', $data);
-        $this->load->view('usuarionovo');
+        $this->load->view('usuario/novo');
         $this->load->view('tmpl/footer');
     }
     
     public function alterar()
     {
         $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        $data = array();
         
         //pegando id do usuario
         $usuario_id = $this->uri->segment(3);
@@ -107,13 +112,37 @@ class Usuario extends CI_Controller
         $usuario = new UsuarioModel($usuario_id);
         $data['usuario'] = $usuario;
         
-        $data = array();
         
         # pegando mensagens da sessão flash
         $data['mensagens'] = $this->session->flashdata('mensagens');
 
         $this->load->view('tmpl/header', $data);
-        $this->load->view('usuarioalterar');
+        $this->load->view('usuario/alterardados');
+        $this->load->view('tmpl/footer');
+    }
+    
+    public function novasenha()
+    {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        $data = array();
+        
+        //pegando id do usuario
+        $usuario_id = $this->uri->segment(3);
+        
+        # carregando model
+        $this->load->model('UsuarioModel');
+
+        # criando o objeto usuário
+        $usuario = new UsuarioModel($usuario_id);
+        $data['usuario'] = $usuario;
+        
+        
+        # pegando mensagens da sessão flash
+        $data['mensagens'] = $this->session->flashdata('mensagens');
+
+        $this->load->view('tmpl/header', $data);
+        $this->load->view('usuario/alterarsenha');
         $this->load->view('tmpl/footer');
     }
     
@@ -126,7 +155,7 @@ class Usuario extends CI_Controller
             array(
                 'field' => 'usuario',
                 'label' => 'Usuário',
-                'rules' => 'trim|required|alpha_numeric|min_length[5]|max_length[20]|xss_clean'
+                'rules' => 'trim|required|alpha_dash|min_length[5]|max_length[20]|xss_clean'
             ),
             array(
                 'field' => 'nome',
@@ -141,7 +170,7 @@ class Usuario extends CI_Controller
             array(
                 'field' => 'senha',
                 'label' => 'Senha',
-                'rules' => 'trim|required|min_length[5]|max_length[200]|matches[confirmacao]|md5'
+                'rules' => 'trim|required|min_length[5]|max_length[200]|alpha_numeric|matches[confirmacao]|md5'
             ),
             array(
                 'field' => 'confirmacao',
@@ -156,6 +185,7 @@ class Usuario extends CI_Controller
         $this->form_validation->set_message('min_length', 'O campo <strong>%s</strong> deve ter no mínimo %s caracteres');
         $this->form_validation->set_message('max_length', 'O campo <strong>%s</strong> deve ter no máximo %s caracteres');
         $this->form_validation->set_message('alpha_numeric', 'O campo <strong>%s</strong> deve ter apenas letras e/ou números');
+        $this->form_validation->set_message('alpha_dash', 'O campo <strong>%s</strong> deve ter apenas letras, números, ou os caracteres sublinhado (_) e traço (-).');
         $this->form_validation->set_message('valid_email', 'O campo <strong>%s</strong> deve ter um endereço de e-mail válido');
         $this->form_validation->set_message('matches', 'Os campos <strong>%s</strong> e <strong>%s</strong> não conferem.');
         
@@ -189,14 +219,161 @@ class Usuario extends CI_Controller
             # gravando dados no banco
             if( $usuario->grava() )
             {
-                $mensagens = array('notice'=>'Usuário criado com sucesso');
+                $mensagens = array('notice'=>'Usuário criado com sucesso.');
                 $this->session->set_flashdata('mensagens', $mensagens);
             }
             
             #erro ao gravar dados
             else
             {
-                $mensagens = array('error'=>'Erro ao criar usuário');
+                $mensagens = array('error'=>'Erro ao criar usuário.');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            # redirecionando
+            redirect(base_url() . 'usuario', 'refresh');
+            exit();
+            
+        }
+    }
+    
+    public function grava_dados()
+    {
+        $this->load->library('form_validation');
+        
+        # validações
+        $validacoes = array(
+            array(
+                'field' => 'usuario',
+                'label' => 'Usuário',
+                'rules' => 'trim|required|alpha_dash|min_length[5]|max_length[20]|xss_clean'
+            ),
+            array(
+                'field' => 'nome',
+                'label' => 'Nome',
+                'rules' => 'trim|required|min_length[5]|max_length[200]|xss_clean'
+            ),
+            array(
+                'field' => 'email',
+                'label' => 'E-mail',
+                'rules' => 'trim|required|max_length[150]|valid_email'
+            )
+        );
+        $this->form_validation->set_rules($validacoes);
+        
+        # mensagens de erro
+        $this->form_validation->set_message('required', 'O campo <strong>%s</strong> é obrigatório');
+        $this->form_validation->set_message('min_length', 'O campo <strong>%s</strong> deve ter no mínimo %s caracteres');
+        $this->form_validation->set_message('max_length', 'O campo <strong>%s</strong> deve ter no máximo %s caracteres');
+        $this->form_validation->set_message('alpha_dash', 'O campo <strong>%s</strong> deve ter apenas letras e/ou números');
+        $this->form_validation->set_message('valid_email', 'O campo <strong>%s</strong> deve ter um endereço de e-mail válido');
+        
+        # definindo delimitadores
+        $this->form_validation->set_error_delimiters('<li class="submiterror">', '</li>');
+        
+        # não passou na validação
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->alterar();
+        }
+        
+        #passou na validação
+        else
+        {
+            
+            # carregando model
+            $this->load->model('UsuarioModel');
+            
+            # criando o objeto usuário
+            $usuario = new UsuarioModel($this->input->post('usuario_id'));
+            
+            # populando obj usuário
+            $usuario->usuario = $this->input->post('usuario');
+            $usuario->nome = $this->input->post('nome');
+            $usuario->email = $this->input->post('email');
+            $usuario->dt_alteracao = date('Y-m-d H:i:s');
+            
+            # gravando dados no banco
+            if( $usuario->grava() )
+            {
+                $mensagens = array('notice'=>'Usuário gravado com sucesso.');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            #erro ao gravar dados
+            else
+            {
+                $mensagens = array('error'=>'Erro ao gravar usuário.');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            # redirecionando
+            redirect(base_url() . 'usuario', 'refresh');
+            exit();
+            
+        }
+    }
+    
+    public function grava_novasenha()
+    {
+        $this->load->library('form_validation');
+        
+        # validações
+        $validacoes = array(
+            array(
+                'field' => 'senha',
+                'label' => 'Senha',
+                'rules' => 'trim|required|min_length[5]|max_length[200]|alpha_numeric|matches[confirmacao]|md5'
+            ),
+            array(
+                'field' => 'confirmacao',
+                'label' => 'Confirmação de Senha',
+                'rules' => 'trim|required'
+            )
+        );
+        $this->form_validation->set_rules($validacoes);
+        
+        # mensagens de erro
+        $this->form_validation->set_message('required', 'O campo <strong>%s</strong> é obrigatório');
+        $this->form_validation->set_message('min_length', 'O campo <strong>%s</strong> deve ter no mínimo %s caracteres');
+        $this->form_validation->set_message('max_length', 'O campo <strong>%s</strong> deve ter no máximo %s caracteres');
+        $this->form_validation->set_message('alpha_numeric', 'O campo <strong>%s</strong> deve ter apenas letras e/ou números');
+        $this->form_validation->set_message('matches', 'Os campos <strong>%s</strong> e <strong>%s</strong> não conferem.');
+        
+        # definindo delimitadores
+        $this->form_validation->set_error_delimiters('<li class="submiterror">', '</li>');
+        
+        # não passou na validação
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->novasenha();
+        }
+        
+        #passou na validação
+        else
+        {
+            
+            # carregando model
+            $this->load->model('UsuarioModel');
+            
+            # criando o objeto usuário
+            $usuario = new UsuarioModel($this->input->post('usuario_id'));
+            
+            # populando obj usuário
+            $usuario->senha = $this->input->post('senha');
+            $usuario->dt_alteracao = date('Y-m-d H:i:s');
+            
+            # gravando dados no banco
+            if( $usuario->grava() )
+            {
+                $mensagens = array('notice'=>'Senha gravada com sucesso.');
+                $this->session->set_flashdata('mensagens', $mensagens);
+            }
+            
+            #erro ao gravar dados
+            else
+            {
+                $mensagens = array('error'=>'Erro ao gravar senha.');
                 $this->session->set_flashdata('mensagens', $mensagens);
             }
             
@@ -227,14 +404,14 @@ class Usuario extends CI_Controller
         # removendo no banco
         if( $usuario->remove() )
         {
-            $mensagens = array('notice'=>'Usuário removido com sucesso');
+            $mensagens = array('notice'=>'Usuário removido com sucesso.');
             $this->session->set_flashdata('mensagens', $mensagens);
         }
 
         # erro ao remover dados
         else
         {
-            $mensagens = array('error'=>'Erro ao remover usuário');
+            $mensagens = array('error'=>'Erro ao remover usuário.');
             $this->session->set_flashdata('mensagens', $mensagens);
         }
 
@@ -285,7 +462,7 @@ class Usuario extends CI_Controller
         $data['mensagens'] = $this->session->flashdata('mensagens');
 
         $this->load->view('tmpl/header', $data);
-        $this->load->view('usuariopermissoes');
+        $this->load->view('usuario/permissoes');
         $this->load->view('tmpl/footer');
         
     }
@@ -317,7 +494,7 @@ class Usuario extends CI_Controller
             $premissao->grava();
         }
         
-        $mensagens = array('notice'=>'Permissões gravadas');
+        $mensagens = array('notice'=>'Permissões gravadas.');
         $this->session->set_flashdata('mensagens', $mensagens);
 
         # redirecionando

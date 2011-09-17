@@ -2,7 +2,7 @@
 
     <div id="content">
 
-        <h1>Editar Usuário</h1>
+        <h1>Definir Senha</h1>
 
         <div id="flash">
             <?php if (is_array($mensagens)): ?>
@@ -22,30 +22,16 @@
 
         <div id="body">
             
+            <p>
+                <b>Usuário:</b> <?php echo $usuario->nome; ?>
+            </p>
+            
             <?php
-            echo form_open('/usuario/grava');
+            echo form_open('/usuario/grava_novasenha');
 
             echo form_fieldset('Dados');
             
             echo form_hidden('usuario_id', $usuario->id);
-
-            echo "<p>";
-            echo form_label('Usuário', 'usuario');
-            echo "<br/>";
-            echo form_input(array('name' => 'usuario', 'id' => 'usuario', 'maxlength' => '100', 'value' => set_value('usuario')));
-            echo "</p>";
-
-            echo "<p>";
-            echo form_label('Nome', 'nome');
-            echo "<br/>";
-            echo form_input(array('name' => 'nome', 'id' => 'nome', 'maxlength' => '100', 'value' => set_value('nome')));
-            echo "</p>";
-
-            echo "<p>";
-            echo form_label('E-mail', 'email');
-            echo "<br/>";
-            echo form_input(array('name' => 'email', 'id' => 'email', 'maxlength' => '100', 'value' => set_value('email')));
-            echo "</p>";
 
             echo "<p>";
             echo form_label('Senha', 'senha');
