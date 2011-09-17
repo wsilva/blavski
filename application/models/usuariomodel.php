@@ -3,7 +3,7 @@
 class UsuarioModel extends CI_Model
 {
 
-    var $usuario_id;
+    var $id;
     var $usuario = '';
     var $senha = '';
     var $nome = '';
@@ -11,20 +11,20 @@ class UsuarioModel extends CI_Model
     var $dt_cadastro = '0000-00-00 00:00:00';
     var $dt_alteracao = '0000-00-00 00:00:00';
 
-    public function __construct($usuario_id = null)
+    public function __construct($id = null)
     {
         parent::__construct();
 
-        if ($usuario_id)
+        if ($id)
         {
-            $this->db->where('id', $usuario_id);
+            $this->db->where('id', $id);
             $query = $this->db->get('usuarios');
 
             if ($query->num_rows == 1)
             {
                 $result = $query->result();
 
-                $this->usuario_id = $usuario_id;
+                $this->id = $id;
                 $this->nome = $result[0]->nome;
                 $this->usuario = $result[0]->usuario;
                 $this->senha = $result[0]->senha;
@@ -43,7 +43,7 @@ class UsuarioModel extends CI_Model
         //without user id we create a new one
         else
         {
-            $this->usuario_id = null;
+            $this->id = null;
         }
         
         return $this;
@@ -66,7 +66,7 @@ class UsuarioModel extends CI_Model
     function alterasenha()
     {
         //no user id
-        if($this->usuario_id == null)
+        if($this->id == null)
         {
             return FALSE;
         }
@@ -78,7 +78,7 @@ class UsuarioModel extends CI_Model
                'senha' => $this->senha,
                'updated' => date('Y-m-d H:i:s')
             );
-            $this->db->where('id',  $this->usuario_id);
+            $this->db->where('id',  $this->id);
             $this->db->update('usuarios', $updateData);
 
             return TRUE;
@@ -88,10 +88,10 @@ class UsuarioModel extends CI_Model
     function grava()
     {
         //inserting new user
-        if($this->usuario_id == null)
+        if($this->id == null)
         {
             $insertData = array(
-               'id' => $this->usuario_id ,
+               'id' => $this->id ,
                'nome' => $this->nome ,
                'usuario' => $this->usuario,
                'senha' => $this->senha,
@@ -101,7 +101,7 @@ class UsuarioModel extends CI_Model
             );
 
             $this->db->insert('usuarios', $insertData);
-            $this->usuario_id = $this->db->insert_id(); //last inserted id
+            $this->id = $this->db->insert_id(); //last inserted id
         }
 
         //updating existing user
@@ -113,7 +113,7 @@ class UsuarioModel extends CI_Model
                'email' => $this->email,
                'dt_alteracao' => date('Y-m-d H:i:s')
             );
-            $this->db->where('id',  $this->usuario_id);
+            $this->db->where('id',  $this->id);
             $this->db->update('usuarios', $updateData);
         }
 
@@ -124,7 +124,7 @@ class UsuarioModel extends CI_Model
     {
 
         //deleting user
-        $this->db->where('id', $this->usuario_id);
+        $this->db->where('id', $this->id);
         $this->db->delete('usuarios');
 
         return TRUE;

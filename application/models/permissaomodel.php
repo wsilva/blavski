@@ -95,21 +95,21 @@ class PermissaoModel extends CI_Model
         return TRUE;
     }
     
-    function removeporusuario()
+    function removeporusuario($usuario_id)
     {
 
         //deleting
-        $this->db->where('usuario_id', $this->usuario_id);
+        $this->db->where('usuario_id', $usuario_id);
         $this->db->delete('permissoes');
 
         return TRUE;
     }
     
-    function removepormetodo()
+    function removepormetodo($metodo_id)
     {
 
         //deleting 
-        $this->db->where('metodo_id', $this->metodo_id);
+        $this->db->where('metodo_id', $metodo_id);
         $this->db->delete('permissoes');
 
         return TRUE;

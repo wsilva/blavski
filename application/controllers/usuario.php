@@ -93,6 +93,30 @@ class Usuario extends CI_Controller
         $this->load->view('tmpl/footer');
     }
     
+    public function alterar()
+    {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        //pegando id do usuario
+        $usuario_id = $this->uri->segment(3);
+        
+        # carregando model
+        $this->load->model('UsuarioModel');
+
+        # criando o objeto usuário
+        $usuario = new UsuarioModel($usuario_id);
+        $data['usuario'] = $usuario;
+        
+        $data = array();
+        
+        # pegando mensagens da sessão flash
+        $data['mensagens'] = $this->session->flashdata('mensagens');
+
+        $this->load->view('tmpl/header', $data);
+        $this->load->view('usuarioalterar');
+        $this->load->view('tmpl/footer');
+    }
+    
     public function grava_novo()
     {
         $this->load->library('form_validation');
@@ -183,6 +207,43 @@ class Usuario extends CI_Controller
         }
     }
     
+    public function remover()
+    {
+        $this->load->library('form_validation');
+        
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        $data = array();
+        
+        //pegando id do usuario
+        $usuario_id = $this->uri->segment(3);
+        
+        # carregando model
+        $this->load->model('UsuarioModel');
+
+        # criando o objeto usuário
+        $usuario = new UsuarioModel($usuario_id);
+
+        # removendo no banco
+        if( $usuario->remove() )
+        {
+            $mensagens = array('notice'=>'Usuário removido com sucesso');
+            $this->session->set_flashdata('mensagens', $mensagens);
+        }
+
+        # erro ao remover dados
+        else
+        {
+            $mensagens = array('error'=>'Erro ao remover usuário');
+            $this->session->set_flashdata('mensagens', $mensagens);
+        }
+
+        # redirecionando
+        redirect(base_url() . 'usuario', 'refresh');
+        exit();
+            
+    }
+    
     public function permissoes()
     {
         $this->auth->check_logged($this->router->class, $this->router->method);
@@ -201,11 +262,68 @@ class Usuario extends CI_Controller
         $permissoes = $this->PermissaoModel->buscarporusuario($usuario_id);
         $metodos = $this->MetodoModel->buscartodos();
         
-        var_dump($usuario);
-        var_dump($permissoes);
-        var_dump($metodos);
-        die('testando');
+        //marcando se tem ou não permissão
+        foreach ($metodos as $metodo)
+        {
+            $metodo->tem_permissao = FALSE;
+            
+            foreach ($permissoes as $permissao)
+            {
+                if($permissao->metodo_id == $metodo->id)
+                {
+                    $metodo->tem_permissao = TRUE;
+                    break;
+                }
+            }
+        }
         
+        $data['usuario'] = $usuario;
+        $data['permissoes'] = $permissoes;
+        $data['metodos'] = $metodos;
+        
+        # pegando mensagens da sessão flash
+        $data['mensagens'] = $this->session->flashdata('mensagens');
+
+        $this->load->view('tmpl/header', $data);
+        $this->load->view('usuariopermissoes');
+        $this->load->view('tmpl/footer');
+        
+    }
+    
+    public function grava_permissoes()
+    {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
+        $data = array();
+        
+        # pergando post
+        $metodos = $this->input->post('metodos');
+        $usuario_id = $this->input->post('usuario_id');
+        
+        # carregando model
+        $this->load->model('PermissaoModel');
+
+        # criando o objeto permissao
+        $permissaoModel = new PermissaoModel();
+        
+        # remove antigas permissões
+        $permissaoModel->removeporusuario($usuario_id);
+        
+        foreach($metodos as $metodo_id)
+        {
+            $premissao = new PermissaoModel();
+            $premissao->usuario_id = $usuario_id;
+            $premissao->metodo_id = $metodo_id;
+            $premissao->grava();
+        }
+        
+        $mensagens = array('notice'=>'Permissões gravadas');
+        $this->session->set_flashdata('mensagens', $mensagens);
+
+        # redirecionando
+        redirect(base_url() . "usuario/permissoes/{$usuario_id}", 'refresh');
+        exit();
+            
     }
 
     public function __construct()
