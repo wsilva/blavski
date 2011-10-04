@@ -239,6 +239,8 @@ class Usuario extends CI_Controller
     
     public function grava_dados()
     {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
         $this->load->library('form_validation');
         
         # validações
@@ -316,6 +318,8 @@ class Usuario extends CI_Controller
     
     public function grava_novasenha()
     {
+        $this->auth->check_logged($this->router->class, $this->router->method);
+        
         $this->load->library('form_validation');
         
         # validações
